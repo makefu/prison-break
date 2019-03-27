@@ -17,7 +17,7 @@ def internet_check() -> str:
     ret = requests.get('http://krebsco.de/secret')
     # mock:
     #return open('1-redirect.html').read()
-    return ret.data
+    return ret.text
 
 def main():
     config = configparser.ConfigParser()
@@ -40,7 +40,7 @@ def main():
         name= plug.__name__
         if plug(data):
             log.info(f"{name} successful?")
-            if check_internet().startswith("1337"):
+            if internet_check().startswith("1337"):
                 log.info(f"{name} successful!")
                 exit(0)
             else:
@@ -59,7 +59,7 @@ def hotsplots(data: str) -> bool:
       log.info("Cannot find needle 'www.hotsplots.de' in response data")
       return False
 
-    parsed = soup(data)
+    parsed = soup(data,features="html.parser")
     postdata = {}
     headers = {
       'Referer': 'https://www.hotsplots.de/auth/login.php',
@@ -71,9 +71,9 @@ def hotsplots(data: str) -> bool:
 
     resp = requests.post('https://www.hotsplots.de/auth/login.php',
       data=postdata,
-      headers={'referer': my_referer}
+      headers=headers
     )
-    log.debug(f"got response:\n{resp.data}")
+    log.debug(f"got response:\n{resp.text}")
     return True
 
 plugins.append(hotsplots)
