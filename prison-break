@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+import configparser
+from os import environ
+from sys import exit
+import logging as log
+from urllib.request import urlopen
+
+log.basicConfig(level=log.INFO)
+
+def main():
+    config = configparser.ConfigParser()
+    config.read(environ['CONNECTION_FILENAME'])
+    token = ""
+
+    if not 'wifi' in config:
+        log.info("Connection is not Wifi, assuming no Captive Portal")
+        exit(0)
+    elif 'wifi-security' in config:
+        log.info("Secured Wifi, assuming no Captive Portal")
+        exit(0)
+
+    with urlopen('http://krebsco.de/secret') as f:
+        log.debug("Retrieving Challenge Token")
+        token = f.read(4096).decode('utf-8')
+
+    if token.startswith("1337"):
+        log.info("Received the correct challenge token, assuming no captive portal")
+        exit(0)
+
+if __name__ == "__main__":
+    main()
