@@ -1,16 +1,27 @@
-#!/usr/bin/env python3
+#!/usr/bin/env nix-shell
+#!nix-shell -p python3.pkgs.requests python3.pkgs.beautifulsoup4 -i python3
 import configparser
 from os import environ
 from sys import exit
 import logging as log
 from urllib.request import urlopen
+import requests
+import urllib
+from bs4 import BeautifulSoup as soup
 
 log.basicConfig(level=log.INFO)
+
+plugins = [ ]
+
+def internet_check() -> str:
+    ret = requests.get('http://krebsco.de/secret')
+    # mock:
+    #return open('1-redirect.html').read()
+    return ret.data
 
 def main():
     config = configparser.ConfigParser()
     config.read(environ['CONNECTION_FILENAME'])
-    token = ""
 
     if not 'wifi' in config:
         log.info("Connection is not Wifi, assuming no Captive Portal")
@@ -19,13 +30,53 @@ def main():
         log.info("Secured Wifi, assuming no Captive Portal")
         exit(0)
 
-    with urlopen('http://krebsco.de/secret') as f:
-        log.debug("Retrieving Challenge Token")
-        token = f.read(4096).decode('utf-8')
-
-    if token.startswith("1337"):
+    data = internet_check()
+    log.debug(f"Response: {data}")
+    if data.startswith("1337"):
         log.info("Received the correct challenge token, assuming no captive portal")
         exit(0)
+
+    for plug in plugins:
+        name= plug.__name__
+        if plug(data):
+            log.info(f"{name} successful?")
+            if check_internet().startswith("1337"):
+                log.info(f"{name} successful!")
+                exit(0)
+            else:
+                log.warn(f"{name} failed to break free, continuing")
+
+        else:
+            log.info(f"{name} returned False, continuing")
+    log.error(f"No plug was able to establish a connection {config['connection']['id']} :(")
+
+def hotsplots(data: str) -> bool:
+    '''
+    return True if successful, else False
+    '''
+    log.info("Checking for hotsplots Portal")
+    if not ("www.hotsplots.de" in data):
+      log.info("Cannot find needle 'www.hotsplots.de' in response data")
+      return False
+
+    parsed = soup(data)
+    postdata = {}
+    headers = {
+      'Referer': 'https://www.hotsplots.de/auth/login.php',
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0'
+    }
+    for inp in parsed.find_all('input'):
+        postdata[inp['name']] = inp.get('value','on') # termsOK
+    log.debug(f"encoded data: {urllib.parse.urlencode(postdata)}")
+
+    resp = requests.post('https://www.hotsplots.de/auth/login.php',
+      data=postdata,
+      headers={'referer': my_referer}
+    )
+    log.debug(f"got response:\n{resp.data}")
+    return True
+
+plugins.append(hotsplots)
 
 if __name__ == "__main__":
     main()
