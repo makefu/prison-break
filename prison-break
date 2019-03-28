@@ -9,15 +9,33 @@ import requests
 import urllib
 from bs4 import BeautifulSoup as soup
 
-log.basicConfig(level=log.INFO)
+log.basicConfig(level=log.DEBUG)
+from http.client import HTTPConnection
+HTTPConnection.debuglevel = 1
+log.getLogger().setLevel(log.DEBUG)
+requests_log = log.getLogger("requests.packages.urllib3")
+requests_log.setLevel(log.DEBUG)
+requests_log.propagate = True
+
 
 plugins = [ ]
 
-def internet_check() -> str:
-    ret = requests.get('http://krebsco.de/secret')
+def meta_redirect(content):
+    parsed = soup(content,features="html.parser")
+
+    result=parsed.find("meta",attrs={"http-equiv":"Refresh"})
+    if result:
+        wait,text=result["content"].split(";")
+        if text.strip().lower().startswith("url="):
+            url=text[4:]
+            return url
+    return None
+
+def internet_check(s) -> str:
+    ret = s.get('http://krebsco.de/secret')
     # mock:
     #return open('1-redirect.html').read()
-    return ret.text
+    return ret
 
 def main():
     config = configparser.ConfigParser()
@@ -29,8 +47,11 @@ def main():
     elif 'wifi-security' in config:
         log.info("Secured Wifi, assuming no Captive Portal")
         exit(0)
-
-    data = internet_check()
+    s = requests.Session()
+    s.headers.update( { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0' })
+    resp = internet_check(s)
+    data = resp.text
+    #data = "WRONG"
     log.debug(f"Response: {data}")
     if data.startswith("1337"):
         log.info("Received the correct challenge token, assuming no captive portal")
@@ -38,9 +59,9 @@ def main():
 
     for plug in plugins:
         name= plug.__name__
-        if plug(data):
+        if plug(resp,s):
             log.info(f"{name} successful?")
-            if internet_check().startswith("1337"):
+            if internet_check(s).text.startswith("1337"):
                 log.info(f"{name} successful!")
                 exit(0)
             else:
@@ -50,10 +71,20 @@ def main():
             log.info(f"{name} returned False, continuing")
     log.error(f"No plug was able to establish a connection {config['connection']['id']} :(")
 
-def hotsplots(data: str) -> bool:
+def hotsplots(resp, s) -> bool:
     '''
+      resp: the initial response of the internet get request
+      s: the requests session for opening new http connections
     return True if successful, else False
     '''
+
+
+    s.headers.update({'Referer':  resp.url})
+    data = resp.text
+
+    #Mock
+    #data = open('1-redirect.html').read()
+    print(s.headers)
     log.info("Checking for hotsplots Portal")
     if not ("www.hotsplots.de" in data):
       log.info("Cannot find needle 'www.hotsplots.de' in response data")
@@ -61,19 +92,11 @@ def hotsplots(data: str) -> bool:
 
     parsed = soup(data,features="html.parser")
     postdata = {}
-    headers = {
-      'Referer': 'https://www.hotsplots.de/auth/login.php',
-      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0'
-    }
     for inp in parsed.find_all('input'):
         postdata[inp['name']] = inp.get('value','on') # termsOK
-    log.debug(f"encoded data: {urllib.parse.urlencode(postdata)}")
 
-    resp = requests.post('https://www.hotsplots.de/auth/login.php',
-      data=postdata,
-      headers=headers
-    )
-    log.debug(f"got response:\n{resp.text}")
+    resp = s.post('https://www.hotsplots.de/auth/login.php', data=postdata)
+    s.get(meta_redirect(resp.text))
     return True
 
 plugins.append(hotsplots)
