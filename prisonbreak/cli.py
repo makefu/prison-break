@@ -1,4 +1,4 @@
-"""usage: prison-break [options]
+"""usage: prison-break [options] [INTERFACE STATUS]
 
 options:
     --debug             enable super duper debugging
@@ -46,7 +46,10 @@ def main():
     # accept: click the "accept AGB" button of the hotspot
     plugins = load("prisonbreak.plugins")
 
-    if not profile:
+    if args['STATUS'] == 'down':
+        log.info('device went down, not doing anything')
+        exit(0)
+    elif not profile:
         log.error("CONNECTION_FILENAME environment is not set"
                   ", assuming unconditional run")
     else:
@@ -77,7 +80,7 @@ def main():
                           "Gecko/20100101 Firefox/65.0"
         }
     )
-    initial_response = s.get(secret_url)
+    initial_response = s.get(secret_url,timeout=5)
 
     if initial_response.text.startswith("1337"):
         log.info("Received the correct challenge token"
@@ -99,7 +102,7 @@ def main():
             continue
         if plug.accept(initial_response, s):
             log.info(f"{name} successful?")
-            if s.get(secret_url).text.startswith("1337"):
+            if s.get(secret_url,timeout=5).text.startswith("1337"):
                 log.info(f"{name} successful!")
                 exit(0)
             else:
