@@ -2,15 +2,21 @@
 
 Free yourself from the chains of having to acknowledging AGBs every time you connect to a captive portal.
 
-## Usage
+## Installation
 
+### NixOS
+After installing [NUR](https://github.com/nix-community/NUR/)
 ```
-install -m755 -uroot prison-break /etc/NetworkManager/dispatcher.d/99prison-break
+{
+  networking.networkmanager.dispatcherScripts = [
+    { source = "${nur.repos.makefu.prison-break}/bin/prison-break"; }
+  ];
+}
 ```
 
-## Testing
-The script will require `CONNECTION_PROFILE` to be set as it will read these
-files to determine if we just connected to a potential captive portal
+### Legacy OS
+If you have no problems working on a tainted system
 ```
-CONNECTION_FILENAME=profiles/WIFI@DB ./prison-break
+python setup.py install
+install -m755 -uroot /usr/bin/prison-break /etc/NetworkManager/dispatcher.d/99prison-break
 ```
