@@ -29,9 +29,19 @@ If you have no problems working on a tainted system
 python setup.py install
 install -m755 -uroot /usr/bin/prison-break /etc/NetworkManager/dispatcher.d/99prison-break
 ```
+## Testing
+prison-break provides a couple of means to override the default behavior such
+as providing a path to the `CONNECTION_FILENAME`:
 
+```
+prison-break --force-run   # do not bail out on missing CONNECTION_FILENAME
+prison-break --force-token # continue even if the challenge token is correct
+prison-break --force-match # contineu even if no plugin matched the connection profile as potential access point
+```
 ## Logs
-This is how a connection may look like for you:
+
+This is how a connection may look like for you when the script is started
+via nm-dispatcher:
 ```
 Apr 04 16:39:09 x nm-dispatcher[16291]: INFO:cli:CONNECTION_FILENAME set, checking if any plugin matches connection pattern
 Apr 04 16:39:09 x nm-dispatcher[16291]: INFO:hotsplots:Unsecured wifi, might be hotsplots!
@@ -42,3 +52,4 @@ Apr 04 16:39:11 x nm-dispatcher[16291]: INFO:hotsplots:Got Redirected and follow
 Apr 04 16:39:11 x nm-dispatcher[16291]: INFO:cli:prisonbreak.plugins.hotsplots successful?
 Apr 04 16:39:12 x nm-dispatcher[16291]: INFO:cli:prisonbreak.plugins.hotsplots successful!
 ```
+

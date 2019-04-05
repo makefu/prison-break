@@ -2,8 +2,9 @@
 
 options:
     --debug             enable super duper debugging
+    --force-run         unconditional run even if no CONNECTION_FILENAME is set
     --force-token       continue even if we received the correct token
-    --force-match       contine for each plugin even if match returned False
+    --force-match       continue for each plugin even if match returned False
 
 the active prison-break connection profile may be set via
 CONNECTION_FILENAME environment variable. This is used to check if the
@@ -46,12 +47,16 @@ def main():
     # accept: click the "accept AGB" button of the hotspot
     plugins = load("prisonbreak.plugins")
 
-    if args['STATUS'] == 'down':
-        log.info('device went down, not doing anything')
+    if args['--force-run']:
+        log.info("CONNECTION_FILENAME environment is not set"
+                  "and --force-run is set, assuming unconditional run")
+    elif args['STATUS'] == 'down':
+        log.info('device went down, doing nothing')
         exit(0)
     elif not profile:
-        log.error("CONNECTION_FILENAME environment is not set"
-                  ", assuming unconditional run")
+        log.info("CONNECTION_FILENAME environment is not set"
+                  ", assuming run as condition-change and doning nothing")
+        exit(0)
     else:
         log.info("CONNECTION_FILENAME set"
                  ", checking if any plugin matches connection pattern")
