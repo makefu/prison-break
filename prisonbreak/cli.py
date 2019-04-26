@@ -57,7 +57,7 @@ def main():
         exit(0)
     elif not profile:
         log.info("CONNECTION_FILENAME environment is not set"
-                  ", assuming run as condition-change and doning nothing")
+                  ", assuming run as condition-change and doing nothing")
         exit(0)
     else:
         log.info("CONNECTION_FILENAME set"
