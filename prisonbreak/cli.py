@@ -6,6 +6,7 @@ options:
     --force-token       continue even if we received the correct token
     --force-match       continue for each plugin even if match returned False
     --timeout=SEC       Receive Timeout in seconds before failing [Default: 10]
+    --wait=SEC          Seconds to wait before trying to log in [Default: 3]
 
 the active prison-break connection profile may be set via
 CONNECTION_FILENAME environment variable. This is used to check if the
@@ -15,6 +16,7 @@ import configparser
 from docopt import docopt
 from os import environ
 from sys import exit
+from time import sleep
 import logging
 log = logging.getLogger('cli')
 import requests
@@ -43,6 +45,7 @@ def main():
     secret_url = "http://krebsco.de/secret"  # return 1337
     profile = environ.get("CONNECTION_FILENAME", None)
     timeout = float(args['--timeout'])
+    wait = float(args['--wait'])
     # plugins implement:
     #  match_connection: check connection profile is a possible hotspot (optional)
     #  match: check if the initial request is possibly the hotspot of the  plugin
@@ -87,6 +90,10 @@ def main():
                           "Gecko/20100101 Firefox/65.0"
         }
     )
+    if wait:
+        log.info(f"Waiting for {wait} seconds before trying to connect")
+        sleep(wait)
+
     initial_response = s.get(secret_url,timeout=timeout)
 
     if initial_response.text.startswith("1337"):
