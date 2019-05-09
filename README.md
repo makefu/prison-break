@@ -10,7 +10,7 @@ With NixOS 19.03 add to your `configuration.nix`:
 {
   # .1 configure prison-break as dispatcher script
   networking.networkmanager.dispatcherScripts = [
-    { source = "${nur.repos.makefu.prison-break}/bin/prison-break"; }
+    { source = "${nur.repos.krebs.prison-break}/bin/prison-break"; }
   ];
 
   # 2. Set up [NUR](https://github.com/nix-community/NUR/)
