@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DB Bahn WIFI</title><link rel="stylesheet" href="/css/bootstrap.css" type="text/css"><link rel="stylesheet" href="/css/stylesheet.css" type="text/css"><link rel="stylesheet" href="/css/main.css" type="text/css"><script src="/js/jquery-2.1.4.min.js"></script><script src="/js/js.cookie.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/main.js"></script><script src="/js/lang.js"></script><script src="/js/animation.js"></script><script src="/js/adjust.js"></script></head><body>
+        <div class="container">
+            <div class="headercontainer rowpartcontainer">
+                <div class="outside"></div>
+                <div class="header centerpart">
+                    <div class="logo">
+                        <img src="/images/main_logo.png" alt="Logo" data-image="/images/main_logo"></div>
+                    <div class="langcontainer">
+                        <div class="langs">
+                            <div id="selectedlang" class="lang bgwhite" data-abbrev="DE" data-value="Deutsch">
+                                <div class="langimg">
+                                    <img src="/images/_de.png" alt="Flag DE" data-image="/images/_de"></div>
+                                <div class="langtext">Deutsch</div>
+                            </div>
+                            <div class="hiddenlangcontainer">
+                                <div class="lang bgwhite" data-abbrev="NL" data-value="Nederlands">
+                                    <div class="langimg">
+                                        <img src="/images/_nl.png" alt="Flag NL" data-image="/images/_nl"></div>
+                                    <div class="langtext">Nederlands</div>
+                                </div>
+                            <div class="lang bgwhite" data-abbrev="EN" data-value="English">
+                                    <div class="langimg">
+                                        <img src="/images/_en.png" alt="Flag EN" data-image="/images/_en"></div>
+                                    <div class="langtext">English</div>
+                                </div>
+                            <div class="lang bgwhite" data-abbrev="FR" data-value="Fran&ccedil;ais">
+                                    <div class="langimg">
+                                        <img src="/images/_fr.png" alt="Flag FR" data-image="/images/_fr"></div>
+                                    <div class="langtext">Fran&ccedil;ais</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="langarrow">
+                            <div class="arrowcontainer arrowcontainerdown">
+                                <i class="arrow arrowdown"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="outside"></div>
+            </div>
+            <div class="contentcontainer rowpartcontainer">
+                <div class="outside"></div>
+                <div class="content centerpart">
+                    <div class="error" id="error-default" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: default"><strong>Error:</strong>
+                                Something went wrong!
+                            </span>
+                        </div>
+                    </div>
+                    <div class="error" id="error-payment" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: payment"><strong>Error:</strong>
+                                Payment failed.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="error" id="error-create_voucher" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: create voucher"><strong>Error:</strong>
+                                Failed to create voucher.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="error" id="error-email" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: invalid email"><strong>Error:</strong>
+                                Email is missing or invalid.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="error" id="error-login" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: login"><strong>Error:</strong>
+                                Error when logging in, please try again
+                            </span>
+                        </div>
+                    </div>
+                    <div class="error" id="error-logout" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: logout"><strong>Error:</strong>
+                                Error when logging out, please try again
+                            </span>
+                        </div>
+                    </div>
+                    <div class="error" id="error-no_voucher" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: missing voucher"><strong>Error:</strong>
+                                Voucher is missing
+                            </span>
+                        </div>
+                    </div>
+                    <div class="error" id="error-invalid_voucher" style="display:none">
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close pull-right" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <span data-slot="DE: Error: invalid voucher"><strong>Error:</strong>
+                                Voucher is invalid
+                            </span>
+                        </div>
+                    </div>
+                    <div class="jumbotron">
+                        
+                        <div class="user-class-2">
+                            
+                            
+                            
+                            <div class="user-offline mainimgd desk">
+                                <img data-image="/images/2c_offline_cover_desk_3" class="mainimg" src="/images/2c_offline_cover_desk_3.jpg"></div>  
+                            <div class="user-offline mainimgd tabl">
+                                <img data-image="/images/2c_offline_cover_tabl_3" class="mainimg" src="/images/2c_offline_cover_tabl_3.jpg"></div> 
+                            <div class="user-offline mainimgd mob">
+                                <img data-image="/images/2c_offline_cover_mob_3" class="mainimg" src="/images/2c_offline_cover_mob_3.jpg"></div>  
+                        </div>
+                        
+                        <div class="connectivity">
+                            
+                            <div class="user-class-2">
+                                <div class="user-offline">
+                                    <div class="rowcontainer">
+                                        <div class="outside"></div>
+                                        <div class="rowcontent">
+                                            <div class="vertcellcontainer">
+                                                <div id="lginbtn" class="vertcell">
+                                                    <form method="post">
+                                                        <input type="hidden" name="login" value="true"><input type="hidden" name="CSRFToken" value="58c332621dec94205671430a908f2dd9"><button id="connect" name="connect" class="btn btn-lg btn-primary connect" type="submit">
+                                                            <span data-slot="DE: 1 class: login button">Jetzt kostenlos surfen</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <div class="terms-link-container vertcell">
+                                                    <div class="terms-link-text">
+                                                        <span data-slot="DE: Before Terms text">Mit der weiteren Nutzung akzeptiere ich die</span>
+                                                        <a href="/de/terms/" data-slot="DE: Terms Link text">Nutzungsbedingungen</a>
+                                                        <span data-slot="DE: After Terms text"> von Icomera AB</span>                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="outside"></div>
+                                    </div>
+                                    <div class="rowcontainer iceportal" data-module="2c_offline_middle_content_iceportal">
+                                        <div class="outside"></div>
+                                        <div class="rowcontent">
+                                            <div class="horicellcontainer">
+                                                <div class="horicellleft" data-module="2c_offline_middle_content_iceportal_img">
+                                                    <img data-image="/images/2c_offline_middle_content_iceportal_img" id="iceportalimg2" src="/images/2c_offline_middle_content_iceportal_img.png"></div>
+                                                <div class="horicellright" data-module="2c_offline_middle_content_iceportal_text">
+                                                    <p class="cellheader" data-slot="DE: 2c_offline_middle_content_iceportal_text_header" data-module="2c_offline_middle_content_iceportal_text_header">Mehr Spa&szlig; an Bord</p>
+                                                    <p data-slot="DE: 2c_offline_middle_content_iceportal_text_body" data-module="2c_offline_middle_content_iceportal_text_body">Ihr kostenloses Entertainmentportal mit&nbsp;&nbsp;<b>Reiseinfos, H&ouml;rb&uuml;chern, Filmen, News</b>&nbsp;und mehr, hier verf&uuml;gbar&nbsp;&nbsp;</p>
+                                                    <p class="cellfooter">
+                                                        <span id="iceportallnk2" data-slot="DE: 2c_offline_middle_content_iceportal_text_footer" data-module="2c_offline_middle_content_iceportal_text_footer"><a href="http://iceportal.de" target="_blank">ICEportal.de</a></span>
+                                                    </p>
+                                                </div>
+                                            </div>     
+                                        </div>
+                                        <div class="outside"></div>
+                                    </div>
+                                    
+                                    
+                                    
+                                    
+                                </div>
+                                
+                                </div>
+                        </div>
+
+                        
+                        </div>
+                </div>
+                <div class="outside"></div>
+            </div>
+            <div class="footercontainer bottom rowpartcontainer footerdesk">
+                <div class="outside"></div>
+                <div class="footer centerpart">
+                    <div id="powered_by" onclick="location.href = 'http://www.icomera.com';">
+                        <span>
+                            <img src="/images/icomera_logo_powered_by.gif" alt="Powered by Icomera"></span> 
+                    </div>
+                    <div>
+                        <span class="footeritem">
+                            &copy; 2018 Icomera AB All Rights Reserved
+                        </span>
+                    </div>
+                    <div>
+                        <span class="footeritem">
+                            &nbsp;|&nbsp;
+                        </span>
+                        <span class="footeritem">
+                            <a href="/de/impressum/" data-slot="DE: Footer: Impressum">Impressum</a>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="footeritem">
+                            &nbsp;|&nbsp;
+                        </span>
+                        <span class="footeritem">
+                            <a href="/de/terms/" data-slot="DE: Footer: terms and conditions">Nutzungsbedingungen</a>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="footeritem">
+                            &nbsp;|&nbsp;
+                        </span>
+                        <span class="footeritem" data-slot="DE: Footer: wifionice link_slot"><a href="http://www.bahn.de">WIFIonICE</a></span>
+                    </div>
+                    <div>
+                        <span class="footeritem iceportal">
+                            &nbsp;|&nbsp;
+                        </span>
+                        <span class="footeritem iceportal" data-slot="DE: Footer: portal link_slot"><a href="http://iceportal.de">ICE Portal</a></span>
+                    </div>
+                    <div data-module="footeritem_faq">
+                        <span class="footeritem">
+                            &nbsp;|&nbsp;
+                        </span>
+                        <span class="footeritem" data-slot="DE: Footer: FAQ"><a href="/de/wifiinfo/">FAQ</a></span>
+                    </div>
+                    
+                                        
+                </div>
+                <div class="outside"></div>
+            </div>
+            <div class="footercontainer bottom footermob">
+                <div class="rowpartcontainer">
+                    <div class="outside"></div>
+                    <div class="footer centerpart">
+                        <div id="powered_by" onclick="location.href = 'http://www.icomera.com';">
+                            <span>
+                                <img src="/images/icomera_logo_powered_by.gif" alt="Powered by Icomera"></span> 
+                        </div>
+                        <div>
+                            <span class="footeritem">
+                                &copy; 2018 Icomera AB All Rights Reserved
+                            </span>
+                        </div>
+                    </div>
+                    <div class="outside"></div>
+                </div>
+                <div class="rowpartcontainer">
+                    <div class="outside"></div>
+                    <div class="footer centerpart">
+                        <div>
+                            <span class="footeritem">
+                                <a href="/de/impressum/" data-slot="DE: Footer: Impressum">Impressum</a>
+                            </span>
+                        </div>
+                        <div>
+                            <span class="footeritem">
+                                &nbsp;|&nbsp;
+                            </span>
+                            <span class="footeritem">
+                                <a href="/de/terms/" data-slot="DE: Footer: terms and conditions">Nutzungsbedingungen</a>
+                            </span>
+                        </div>
+                        <div>
+                            <span class="footeritem">
+                                &nbsp;|&nbsp;
+                            </span>
+                            <span class="footeritem" data-slot="DE: Footer: wifionice link_slot"><a href="http://www.bahn.de">WIFIonICE</a></span>
+                        </div>
+                        <div>
+                            <span class="footeritem iceportal">
+                                &nbsp;|&nbsp;
+                            </span>
+                            <span class="footeritem iceportal" data-slot="DE: Footer: portal link_slot"><a href="http://iceportal.de">ICE Portal</a></span>
+                        </div>
+                        <div data-module="footeritem_faq">
+                            <span class="footeritem">
+                                &nbsp;|&nbsp;
+                            </span>
+                            <span class="footeritem" data-slot="DE: Footer: FAQ"><a href="/de/wifiinfo/">FAQ</a></span>
+                        </div>
+                        
+                         
+                    </div>
+                    <div class="outside"></div>
+                </div>
+            </div>
+            </div>
+    </body></html>
