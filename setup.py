@@ -4,7 +4,7 @@ setup(
     name="prison-break",
     description="Free yourself from the chains of having to"
     "acknowledging AGBs every time you connect to a captive portal",
-    version="1.1.0",
+    version="1.2.0",
     packages=["prisonbreak", "prisonbreak.plugins"],
     license="MIT",
     long_description=open("README.md").read(),

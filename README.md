@@ -2,6 +2,15 @@
 
 Free yourself from the chains of having to acknowledging AGBs every time you connect to a captive portal.
 
+## Supported Plugins
+
+* **Hotsplots**
+  * Free Wifi in Stuttgart S-Bahn
+  * should work for all Hotsplots Access Points (only tested with WIFI@DB)
+* **WIFIonICE**
+  * Free Wifi in Deutsche Bahn ICE
+  * from Icomera AB
+
 ## Installation
 
 ### NixOS
