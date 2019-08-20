@@ -41,11 +41,13 @@ def configure_debug(debug: bool) -> None:
 
 def main():
     args = docopt(__doc__)
-    configure_debug(args["--debug"])
     secret_url = "http://krebsco.de/secret"  # return 1337
     profile = environ.get("CONNECTION_FILENAME", None)
     timeout = float(args['--timeout'])
     wait = float(args['--wait'])
+    debug = args["--debug"]
+
+    configure_debug(debug)
     # plugins implement:
     #  match_connection: check connection profile is a possible hotspot (optional)
     #  match: check if the initial request is possibly the hotspot of the  plugin
@@ -60,7 +62,7 @@ def main():
         exit(0)
     elif not profile:
         log.info("CONNECTION_FILENAME environment is not set"
-                  ", assuming run as condition-change and doing nothing")
+                  ", assuming run as condition-change and doing nothing. Force with --force-run")
         exit(0)
     else:
         log.info("CONNECTION_FILENAME set"
