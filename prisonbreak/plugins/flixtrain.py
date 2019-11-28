@@ -31,7 +31,6 @@ def match_connection(connection: ConfigParser) -> bool:
         log.info("Secured Wifi, assuming no Captive Portal")
         return False
     elif True:
-        help(connection)
         log.info("Access Point Starts with Flix, may be flixbus")
     else:
         log.info("Unsecured wifi, might be flixbus!")
@@ -73,7 +72,6 @@ def accept(resp: requests.Response, s: requests.Session) -> bool:
 
     # First Request
     log.debug(f"Sending first request to {resp.url} with data {getdata}")
-    help(s.get)
     resp = s.get(resp.url, params=getdata)
 
     try:
