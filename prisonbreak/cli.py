@@ -5,8 +5,10 @@ options:
     --force-run         unconditional run even if no CONNECTION_FILENAME is set
     --force-token       continue even if we received the correct token
     --force-match       continue for each plugin even if match returned False
-    --timeout=SEC       Receive Timeout in seconds before failing [Default: 10]
+    --timeout=SEC       Receive Timeout in seconds before failing [Default: 5]
+    --timeout-wait=SEC  Seconds to wait after a failed timeout [Default: 0]
     --wait=SEC          Seconds to wait before trying to log in [Default: 3]
+    --retry=NUM         Retry the initial connection on timeout [Default: 3]
 
 the active prison-break connection profile may be set via
 CONNECTION_FILENAME environment variable. This is used to check if the
@@ -20,6 +22,7 @@ from time import sleep
 import logging
 log = logging.getLogger('cli')
 import requests
+from requests import Timeout
 from straight.plugin import load
 
 
@@ -44,6 +47,8 @@ def main():
     secret_url = "http://krebsco.de/secret"  # return 1337
     profile = environ.get("CONNECTION_FILENAME", None)
     timeout = float(args['--timeout'])
+    tries = int(args['--retry'])
+    timeout_wait = float(args['--timeout-wait'])
     wait = float(args['--wait'])
     debug = args["--debug"]
 
@@ -96,7 +101,20 @@ def main():
         log.info(f"Waiting for {wait} seconds before trying to connect")
         sleep(wait)
 
-    initial_response = s.get(secret_url,timeout=timeout)
+    for n in range(tries):
+        try:
+            initial_response = s.get(secret_url,timeout=timeout)
+        except Timeout as t:
+            log.info(f"Timeout number {n+1}, waiting {timeout_wait} seconds")
+            sleep(timeout_wait)
+            continue
+        else:
+            log.debug(f"Success in try {n+1}")
+            break
+    else:
+        log.error(f'Unable to Retrieve the initial response after {tries} tires')
+        exit(1)
+
 
     if initial_response.text.startswith("1337"):
         log.info("Received the correct challenge token"
