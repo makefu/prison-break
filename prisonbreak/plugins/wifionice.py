@@ -36,7 +36,8 @@ def match(resp: requests.Response) -> bool:
     """
       resp: the initial response of the internet get request
     """
-    return "www.wifionice.de" in resp.url
+    return "www.wifionice.de" in resp.url or \
+            "public-wifi.deutschebahn.com" in resp.url
 
 
 def accept(resp: requests.Response, s: requests.Session) -> bool:
