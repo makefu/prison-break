@@ -11,6 +11,10 @@ Free yourself from the chains of having to acknowledging AGBs every time you con
   * Free Wifi in Deutsche Bahn ICE
   * from Icomera AB
 
+## Related Projects
+
+* [py-iwd-autocapptiveauth by `onny`]( https://git.project-insanity.org/onny/py-iwd-autocaptiveauth ) - uses DBUS instead of network-manager hooks which makes it integrate better with different wifi managers
+
 ## Installation
 
 ### NixOS
