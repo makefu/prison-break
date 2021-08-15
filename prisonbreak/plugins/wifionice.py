@@ -25,8 +25,9 @@ def match_connection(connection: ConfigParser) -> bool:
         return true for an open wifi spot as hotsplots only provides open spots
     """
     # TODO: SSID WIFIonICE
-    if connection["wifi"]["ssid"] == "WIFIonICE":
-        log.info("SSID is WIFIonICE, assuming captive portal")
+    if connection["wifi"]["ssid"].lower() == "wifionice" or \
+        connection["wifi"]["ssid"].lower() == "wifi@db":
+        log.info(f"SSID is {connection['wifi']['ssid']}, assuming captive portal on an DB InterCity Express")
         return True
     else:
         return False
@@ -37,7 +38,8 @@ def match(resp: requests.Response) -> bool:
       resp: the initial response of the internet get request
     """
     return "www.wifionice.de" in resp.url or \
-            "public-wifi.deutschebahn.com" in resp.url
+            "public-wifi.deutschebahn.com" in resp.url or \
+            "wifi.bahn.de"
 
 
 def accept(resp: requests.Response, s: requests.Session) -> bool:
@@ -57,15 +59,20 @@ def accept(resp: requests.Response, s: requests.Session) -> bool:
     parsed = soup(data, features="html.parser")
     postdata = {}
 
-    # If this logic stops to work at some point, here are some pointers:
-    #   TODO: find the correct form
-    #   TODO: detect the correct URL to query based on form path and url
     for inp in parsed.find_all("input"):
-        postdata[inp["name"]] = inp.get("value", "")  # login
+        try:
+            postdata[inp["name"]] = inp.get("value", "")  # login
+        except:
+            log.debug(f"Cannot update post-date from {inp}")
+            pass
 
     # First Request
     log.info("Sending POST to login url")
     log.debug(f"data: {postdata}")
-    resp = s.post("http://www.wifionice.de/de/?url=http%3A%2F%2Fkrebsco.de%2Fsecret", data=postdata)
-    log.debug("Return code: {resp.status_code}")
+
+    #   TODO: detect the correct URL to query based on form path and url
+    # The URL changed from http to http, and wifionice.de is now wifi.bahn.de
+    resp = s.post("https://wifi.bahn.de/de/?url=http%3A%2F%2Fkrebsco.de%2Fsecret", data=postdata)
+    log.debug(f"Return code: {resp.status_code}")
+    log.debug(resp.headers)
     return resp.ok
