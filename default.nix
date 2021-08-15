@@ -6,6 +6,7 @@ python3.pkgs.buildPythonPackage {
     docopt
     requests
     beautifulsoup4
+    notify2
     (callPackage ./straight-plugin.nix {})
   ];
   checkInputs = [ python3.pkgs.black ];

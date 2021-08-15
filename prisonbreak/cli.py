@@ -6,9 +6,10 @@ options:
     --force-token       continue even if we received the correct token
     --force-match       continue for each plugin even if match returned False
     --timeout=SEC       Receive Timeout in seconds before failing [Default: 5]
-    --timeout-wait=SEC  Seconds to wait after a failed timeout [Default: 0]
+    --timeout-wait=SEC  Seconds to wait after a failed timeout [Default: 1]
     --wait=SEC          Seconds to wait before trying to log in [Default: 3]
     --retry=NUM         Retry the initial connection on timeout [Default: 3]
+    --no-notify            disable notifications
 
 the active prison-break connection profile may be set via
 CONNECTION_FILENAME environment variable. This is used to check if the
@@ -21,6 +22,9 @@ from sys import exit
 from time import sleep
 import logging
 log = logging.getLogger('cli')
+import notify2
+import os
+import functools
 import requests
 from requests import Timeout
 from straight.plugin import load
@@ -41,6 +45,15 @@ def configure_debug(debug: bool) -> None:
         logging.basicConfig(level=logging.INFO)
         log.setLevel(logging.INFO)
 
+def send_notify(message,title="Prison-Break",icon="dialog-warning-symbolic",do_notify=True,timeout=10,critical=False):
+    if do_notify:
+        log.debug(f"Notify summary={title}, message={message}")
+        n = notify2.Notification(summary=title,icon=icon,message=message)
+        if critical:
+            n.set_urgency(notify2.URGENCY_CRITICAL)
+        n.set_timeout(timeout*1000)
+        n.show()
+
 
 def main():
     args = docopt(__doc__)
@@ -48,9 +61,11 @@ def main():
     profile = environ.get("CONNECTION_FILENAME", None)
     timeout = float(args['--timeout'])
     tries = int(args['--retry'])
+    notify = not args['--no-notify']
     timeout_wait = float(args['--timeout-wait'])
     wait = float(args['--wait'])
     debug = args["--debug"]
+
 
     configure_debug(debug)
     # plugins implement:
@@ -58,6 +73,21 @@ def main():
     #  match: check if the initial request is possibly the hotspot of the  plugin
     # accept: click the "accept AGB" button of the hotspot
     plugins = load("prisonbreak.plugins")
+
+    if notify:
+        log.info("Initializing notify")
+        try:
+            notify2.init('prison-break')
+        except Exception as e:
+            log.error("Error while initializing notify")
+            log.error(e)
+
+            log.info("For notifications to work, the DISPLAY and DBUS_SESSION_BUS_ADDRESS environment Variables must be set correctly (the logged in user). This is how they are currently set up :")
+            log.info(f"DISPLAY={os.environ.get('DISPLAY')}")
+            log.info(f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS')}")
+            notify=False
+    note = functools.partial(send_notify,do_notify=notify)
+
 
     if args['--force-run']:
         log.info("CONNECTION_FILENAME environment is not set"
@@ -106,11 +136,13 @@ def main():
             initial_response = s.get(secret_url,timeout=timeout)
         except Timeout as t:
             log.info(f"Timeout number {n+1}, waiting {timeout_wait} seconds")
-            sleep(timeout_wait)
             continue
+        except requests.exceptions.ConnectionError as t:
+            log.info(f"Connection Error {n+1}, waiting {timeout_wait} seconds")
         else:
             log.debug(f"Success in try {n+1}")
             break
+        sleep(timeout_wait)
     else:
         log.error(f'Unable to Retrieve the initial response after {tries} tires')
         exit(1)
@@ -124,8 +156,10 @@ def main():
         else:
             exit(0)
 
+    note("trying to connect with the available prison-break plugins",title="Prison-Break detected captive Portal!")
     for plug in plugins:
         name = plug.__name__
+        sname = name.split(".")[-1]
         log.info(f"Running Plugin {name}")
         matched = plug.match(initial_response)
         if args['--force-match']:
@@ -134,18 +168,26 @@ def main():
         elif not matched:
             log.info(f"{name} cannot log into hotspot")
             continue
+        note("Trying to accept AGBs for you now!",title=f"Prison-Break Plugin {name}")
+        #notify2.Notification("Summary", "Some body text", "notification-message-im").show()
         if plug.accept(initial_response, s):
             log.info(f"{name} successful?")
             if s.get(secret_url,timeout=timeout).text.startswith("1337"):
+                #notify2.Notification("Prison-Break", "Plugin {name} successful", "notification-message-im").show()
+
                 log.info(f"{name} successful!")
+                note("Managed to click you through the AGB captive portal.\nYou are now logged in!",title=f"Prison-Break Plugin {name}",timeout=20,critical=True)
                 exit(0)
             else:
+                #notify2.Notification("Prison-Break", "Plugin {name} tried to accept AGB but failed", "notification-message-im").show()
                 log.warn(f"{name} failed to break free, continuing")
+                note("Failed to log in, trying next plugin",title=f"Prison-Break Plugin {name}")
 
         else:
             log.info(f"{name} returned False, continuing")
 
     log.error("No plug was able to establish a connection")
+    note("No Plugin was able to log through the captive portal, you will probably have to do it by hand, sorry!",title="Prison-Break failed",critical=True)
 
 
 if __name__ == "__main__":
