@@ -7,19 +7,6 @@ from bs4 import BeautifulSoup as soup
 log = logging.getLogger("wifionice")
 
 
-# TODO: put into common
-def meta_redirect(content: str) -> str:
-    parsed = soup(content, features="html.parser")
-
-    result = parsed.find("meta", attrs={"http-equiv": "refresh"})
-    if result:
-        wait, text = result["content"].split(";")
-        if text.strip().lower().startswith("url="):
-            url = text[4:]
-            return url
-    raise Exception("Cannot find meta redirect in content")
-
-
 def match_connection(connection: ConfigParser) -> bool:
     """
         return true for an open wifi spot as hotsplots only provides open spots

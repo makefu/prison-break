@@ -30,10 +30,11 @@ def match_connection(connection: ConfigParser) -> bool:
     elif "wifi-security" in connection:
         log.info("Secured Wifi, assuming no Captive Portal")
         return False
-    elif True:
+    elif connection["wifi"]["ssid"].lower().startswith("flix"):
         log.info("Access Point Starts with Flix, may be flixbus")
+        return True
     else:
-        log.info("Unsecured wifi, might be flixbus!")
+        log.info("Unsecured wifi, might be flixbus - we are very optimistic here!")
         return True
 
 
