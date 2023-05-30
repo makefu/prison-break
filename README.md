@@ -18,12 +18,12 @@ Free yourself from the chains of having to acknowledging AGBs every time you con
 ## Installation
 
 ### NixOS
-With NixOS 19.03 add to your `configuration.nix`:
+With NixOS 23.05 add to your `configuration.nix`:
 ```
 {
   # .1 configure prison-break as dispatcher script
   networking.networkmanager.dispatcherScripts = [
-    { source = "${nur.repos.makefu.prison-break}/bin/prison-break"; }
+    { source = "${pkgs.nur.repos.makefu.prison-break}/bin/prison-break"; }
   ];
 
   # 2. Set up [NUR](https://github.com/nix-community/NUR/)
